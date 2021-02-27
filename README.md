@@ -2,6 +2,14 @@
 
 This Ruby script converts EPS files produced by Leland Smith's SCORE music typesetting software to SVG.
 
+## Download and installing
+
+     git clone https://github.com/craigsapp/seps2svg
+     cd seps2svg
+     make 
+     
+you will probably have to install ruby (I am using ruby v.2.7.0).  One way is with [RVM](https://rvm.io/rvm/install) (Ruby Version Manager).
+     
 ## Usage
 
     ruby seps2svg.rb EPSFILE
