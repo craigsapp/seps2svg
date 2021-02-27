@@ -123,8 +123,9 @@ def process_eps
     # line of the form "15540.3 -17970.0  16950.0    144.5 trl"
     when /^\s*#{$re_number}\s+#{$re_number}\s+#{$re_number}\s+#{$re_number}\s+trl\s*$/o
       process_trill(line)
-    # line of the form "/Times-Roman                  f [   485.082 0 0   485.082 0 0] mkf sf"
-    when /^\s*\/#{$re_psname}\s+f \[\s*#{$re_number}\s+0\s+0\s+#{$re_number}\s+0\s+0\] mkf sf\s*$/o
+    # line of the form    "/Times-Roman                  f [   485.082 0 0   485.082 0 0] mkf sf"
+    # or line of the form " /Times-Roman                  f [ 771.442 0 0 771.442 0 0 ] mkf sf"
+    when /^\s*\/#{$re_psname}\s+f\s+\[\s*#{$re_number}\s+0\s+0\s+#{$re_number}\s+0\s+0\s*\]\s+mkf\s+sf\s*$/o
       set_font(line)
     # line of the form "     150  -23832 m save (Contrebasses) show"
     when /^\s*#{$re_number}\s+#{$re_number}\s+m\s+save\s*\(.*\)\s*show\s*$/o
