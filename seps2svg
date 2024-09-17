@@ -68,14 +68,19 @@ $bmar = splitline[4]
 
 
 def root_element
+
+  viewbox_width = $bb_right - $bb_left
+  viewbox_height = $bb_top - $bb_bottom
+
   $svg << %Q{<?xml version="1.0"?>\n}
   $svg << %Q{<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"\n}
   $svg << %Q{  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n\n}
   $svg << %Q{<svg version="1.1"\n}
   $svg << %Q{     xmlns="http://www.w3.org/2000/svg"\n}
   $svg << %Q{     xmlns:xlink="http://www.w3.org/1999/xlink"\n}
-  $svg << %Q{     viewBox="#{$bb_left} 0 #{$bb_right - $bb_left} #{$bb_top - $bb_bottom}"\n}
-  $svg << %Q{     width="#{$bb_right - $bb_left}" height="#{$bb_top - $bb_bottom}">\n}
+  #$svg << %Q{     viewBox="#{$bb_left} 0 #{$bb_right - $bb_left} #{$bb_top - $bb_bottom}"\n}
+  $svg << %Q{     viewBox="#{$bb_left} #{$bb_botom}  #{viewbox_width} #{viewbox_height}"\n}
+  $svg << %Q{     width="#{viewbox_width}" height="#{viewbox_height}">\n}
   $svg << %Q{<g transform="translate(0,#{$bb_top}) scale(1,-1) scale(#{$size}) translate(#{$lmar},#{$bmar})" }
   $svg << %Q{stroke-linejoin="round" color="black" stroke="currentColor" fill="none" stroke-width="#{$wdl}"  fill-rule="evenodd">\n}
 
@@ -142,6 +147,8 @@ def process_eps
     # line of the form " g 1   2.00000 scale"
     when /^\s*g\s+1\s+#{$re_number}\s+scale\s*$/o
       process_ellipse(line)
+    when /^\s*g\s+(-?\d+)\s+(-?\d+)\s+tr\s+(-?\d+\.?\d*)\s+rotate\s+(-?\d+)\s+(-?\d+)\s+tr\s*$/
+      process_rotate(line)
     else
       recognized = false
       unrecognized_code << line
@@ -307,6 +314,20 @@ def set_font(line)
   $current_y_size = line[6].to_i
 end
 
+
+def process_rotate(line)
+  # Regular expression to match the structure of the line
+  if line =~ /^\s*g\s+(-?\d+)\s+(-?\d+)\s+tr\s+(-?\d+\.?\d*)\s+rotate\s+(-?\d+)\s+(-?\d+)\s+tr\s*$/
+    # Extract matched values
+    @rotate_translation_before_rotate_x = $1.to_i # First translation X
+    @rotate_translation_before_rotate_y = $2.to_i # First translation Y
+    @rotate_angle = $3.to_f                       # Rotation angle (as float)
+    @rotate_translation_after_rotate_x = $4.to_i  # Second translation X
+    @rotate_translation_after_rotate_y = $5.to_i  # Second translation Y
+  end
+end
+
+
 def process_text(line)
   def write_text_content(string)
     # TODO: Define precise character positions using x-Attribute
@@ -361,8 +382,17 @@ def process_text(line)
   # line of the form "   7190  -20482 m save      .00 0 32    22.95 0 (cresc.) aw"
   #               or "     150  -23832 m save (Contrebasses) show"
   x,y = line.split
-  $svg << %Q{<text transform="translate(#{x},#{y}) scale(1,#{-$current_y_size/$current_x_size})" fill="currentColor" stroke="none"}
+
+
+  translate_string = "translate(#{x},#{y})";
+  if @rotate_angle
+    translate_string = "translate(#{@rotate_translation_beford_rotate_x},#{@rotate_translation_beford_rotate_y}) rotate(#{@rotate_angle}) translate(#{@rotate_translation_after_rotate_x},#{@rotate_translation_after_rotate_y}) #{translate_string}"
+    @rotate_angle = 0;
+  end
+
+  $svg << %Q{<text transform="#{translate_string}  scale(1,#{-$current_y_size/$current_x_size})" fill="currentColor" stroke="none"}
   $svg << %Q{ font-size="#{$current_x_size}" #{$currentfont}>}
+
   string = line[/(?<=\()(.*)(?=\))/]
   if (line[/show\s*$/]) then
     write_text_content(string)
