@@ -386,7 +386,7 @@ def process_text(line)
 
   translate_string = "translate(#{x},#{y})";
   if @rotate_angle
-    translate_string = "translate(#{@rotate_translation_beford_rotate_x},#{@rotate_translation_beford_rotate_y}) rotate(#{@rotate_angle}) translate(#{@rotate_translation_after_rotate_x},#{@rotate_translation_after_rotate_y}) #{translate_string}"
+    translate_string = "translate(#{@rotate_translation_before_rotate_x},#{@rotate_translation_before_rotate_y}) rotate(#{@rotate_angle}) translate(#{@rotate_translation_after_rotate_x},#{@rotate_translation_after_rotate_y}) #{translate_string}"
     @rotate_angle = 0;
   end
 
