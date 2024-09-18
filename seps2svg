@@ -147,7 +147,7 @@ def process_eps
     # line of the form " g 1   2.00000 scale"
     when /^\s*g\s+1\s+#{$re_number}\s+scale\s*$/o
       process_ellipse(line)
-    when /^\s*g\s+(-?\d+)\s+(-?\d+)\s+tr\s+(-?\d+\.?\d*)\s+rotate\s+(-?\d+)\s+(-?\d+)\s+tr\s*$/
+    when /^\s*g\s+(-?\d+\.?\d*)\s+(-?\d+\.?\d*)\s+tr\s+(-?\d+\.?\d*)\s+rotate\s+(-?\d+\.?\d*)\s+(-?\d+\.?\d*)\s+tr\s*$/
       process_rotate(line)
     else
       recognized = false
@@ -317,13 +317,13 @@ end
 
 def process_rotate(line)
   # Regular expression to match the structure of the line
-  if line =~ /^\s*g\s+(-?\d+)\s+(-?\d+)\s+tr\s+(-?\d+\.?\d*)\s+rotate\s+(-?\d+)\s+(-?\d+)\s+tr\s*$/
+  if line =~ /^\s*g\s+(-?\d+\.?\d*)\s+(-?\d+\.?\d*)\s+tr\s+(-?\d+\.?\d*)\s+rotate\s+(-?\d+\.?\d*)\s+(-?\d+\.?\d*)\s+tr\s*$/
     # Extract matched values
-    @rotate_translation_before_rotate_x = $1.to_i # First translation X
-    @rotate_translation_before_rotate_y = $2.to_i # First translation Y
+    @rotate_translation_before_rotate_x = $1.to_f # First translation X
+    @rotate_translation_before_rotate_y = $2.to_f # First translation Y
     @rotate_angle = $3.to_f                       # Rotation angle (as float)
-    @rotate_translation_after_rotate_x = $4.to_i  # Second translation X
-    @rotate_translation_after_rotate_y = $5.to_i  # Second translation Y
+    @rotate_translation_after_rotate_x = $4.to_f  # Second translation X
+    @rotate_translation_after_rotate_y = $5.to_f  # Second translation Y
   end
 end
 
